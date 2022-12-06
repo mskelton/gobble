@@ -1,9 +1,5 @@
 package rss
 
-import (
-	"github.com/spf13/cobra"
-)
-
 type RssItem struct {
 	Id          string   `xml:"post-id"`
 	Uri         string   `xml:"link"`
@@ -26,10 +22,9 @@ type RssFeed struct {
 	Channel RssChannel `xml:"channel"`
 }
 
-func Read(uri string) RssFeed {
+func Read(uri string) (RssFeed, error) {
 	feed := RssFeed{}
 	err := GetXml(uri, &feed)
-	cobra.CheckErr(err)
 
-	return feed
+	return feed, err
 }

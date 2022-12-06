@@ -4,28 +4,41 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
+	"github.com/mskelton/gobble/cache"
 	"github.com/mskelton/gobble/config"
-	"github.com/mskelton/gobble/rss"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "gobble",
 	Short: "List RSS items from all feeds",
-	Run: func(cmd *cobra.Command, args []string) {
-		cfg := config.Read()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg, err := config.Read()
+		if err != nil {
+			return err
+		}
 
-		for _, source := range cfg.Feeds {
-			feed := rss.Read(source.Uri)
+		c, err := cache.ReadS(cfg)
+		if err != nil {
+			return err
+		}
 
-			fmt.Println("")
-			fmt.Println(feed.Channel.Title)
-			fmt.Println("--------------")
+		for i, feed := range c.Feeds {
+			// Print a separator between feeds
+			if i != 0 {
+				fmt.Println()
+			}
 
-			for _, item := range feed.Channel.Items {
+			// Print the feed title
+			color.New(color.Bold, color.FgBlue).Println(feed.Title)
+
+			for _, item := range feed.Items {
 				fmt.Println(item.Title)
 			}
 		}
+
+		return nil
 	},
 }
 
