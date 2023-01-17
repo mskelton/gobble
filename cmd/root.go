@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -11,12 +12,17 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gobble",
-	Short: "List RSS items from all feeds",
+	Use:          "gobble",
+	Short:        "List RSS items from all feeds",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := config.Read()
+		cfg, err := config.ReadConfig()
 		if err != nil {
 			return err
+		}
+
+		if len(cfg.Feeds) == 0 {
+			return errors.New("No feeds configured. Please configure a feed in ~/.config/gobble/config.yml")
 		}
 
 		c, err := cache.ReadS(cfg)

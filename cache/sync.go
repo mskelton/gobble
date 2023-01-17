@@ -8,22 +8,29 @@ import (
 )
 
 type CachedFeedItem struct {
-	Id          string    `json:"id"`
-	Uri         string    `json:"uri"`
-	Title       string    `json:"title"`
-	PublishedAt time.Time `json:"publishedAt"`
-	Categories  []string  `json:"categories"`
+	Id          string    `yaml:"id"`
+	Uri         string    `yaml:"uri"`
+	Title       string    `yaml:"title"`
+	PublishedAt time.Time `yaml:"publishedAt"`
+	Categories  []string  `yaml:"categories"`
 }
 
 type CachedFeed struct {
-	Id    string           `json:"id"`
-	Title string           `json:"title"`
-	Items []CachedFeedItem `json:"items"`
+	Id    string           `yaml:"id"`
+	Title string           `yaml:"title"`
+	Items []CachedFeedItem `yaml:"items"`
+}
+
+type RecentItem struct {
+	Id    int    `yaml:"id"`
+	Uri   string `yaml:"uri"`
+	Title string `yaml:"title"`
 }
 
 type Cache struct {
-	Feeds       []CachedFeed `json:"feeds"`
-	LastUpdated time.Time    `json:"lastUpdated"`
+	LastUpdated time.Time    `yaml:"lastUpdated"`
+	Feeds       []CachedFeed `yaml:"feeds"`
+	RecentItems []RecentItem `yaml:"recent-items"`
 }
 
 func Sync(cfg config.Config) (Cache, error) {
@@ -64,6 +71,6 @@ func Sync(cfg config.Config) (Cache, error) {
 		c.Feeds = append(c.Feeds, cachedFeed)
 	}
 
-	err := writeState(c)
+	err := writeCache(c)
 	return c, err
 }

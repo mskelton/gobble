@@ -1,12 +1,7 @@
 package config
 
 import (
-	"errors"
-	"os"
 	"path"
-
-	"github.com/mskelton/gobble/utils"
-	"gopkg.in/yaml.v3"
 )
 
 type Feed struct {
@@ -18,16 +13,8 @@ type Config struct {
 	Feeds []Feed `yaml:"feeds"`
 }
 
-func Write(data []byte) error {
-	name, err := getConfigFilename()
-	if err != nil {
-		return err
-	}
-
-	return utils.WriteFile(name, data)
-}
-
-func Read() (Config, error) {
+// Reads the Gobble config file
+func ReadConfig() (Config, error) {
 	cfg := Config{Feeds: []Feed{}}
 
 	name, err := getConfigFilename()
@@ -35,24 +22,11 @@ func Read() (Config, error) {
 		return cfg, err
 	}
 
-	data, err := os.ReadFile(name)
-
-	// If the file doesn't exist, don't error as we just use the defaults
-	if errors.Is(err, os.ErrNotExist) {
-		return cfg, nil
-	} else if err != nil {
-		return cfg, err
-	}
-
-	err = yaml.Unmarshal(data, &cfg)
+	err = ReadYaml(name, &cfg)
 	return cfg, err
 }
 
+// Returns the filename of the Gobble config file
 func getConfigFilename() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	return path.Join(home, ".config", "gobble", "config.yml"), nil
+	return GetFilename(path.Join(".config", "gobble", "config.yml"))
 }

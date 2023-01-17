@@ -12,7 +12,7 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get's the status of your unread feeds",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg, err := config.Read()
+		cfg, err := config.ReadConfig()
 		if err != nil {
 			return err
 		}
